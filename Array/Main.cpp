@@ -14,6 +14,7 @@ void PrintArray(const char* array, int length)
 const int TEST = 10;
 int main()
 {
+	char t = 1;
 	int array[TEST] = {};
 	memset(array, 0, sizeof(int) * 10);
 
