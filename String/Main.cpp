@@ -1,4 +1,7 @@
 #include <iostream>
+#include <WIndows.h>
+
+#define MYTEXT(value) L##value
 
 class Player
 {
@@ -35,8 +38,15 @@ int main()
 {
 	// 문자열
 	// 문자열은 불변성을 가짐.
+	const char* test = "Test";
+	test = "1234";
 
 	Player player("mw");
+
+	//const wchar_t* wideString = L"Hello wide string";
+	const wchar_t* wideString = MYTEXT("123");
+
+	std::wcout << wideString << TEXT("\n");
 
 	
 	std::cin.get();
