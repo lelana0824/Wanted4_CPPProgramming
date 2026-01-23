@@ -38,16 +38,9 @@ int main()
 {
 	// 문자열
 	// 문자열은 불변성을 가짐.
-	const char* test = "Test";
-	test = "1234";
+	char name2[3] = { 'm', 'n', '\0' };
+	char* test = name2;
+	char* test2 = &name2[1];
 
-	Player player("mw");
-
-	//const wchar_t* wideString = L"Hello wide string";
-	const wchar_t* wideString = MYTEXT("123");
-
-	std::wcout << wideString << TEXT("\n");
-
-	
 	std::cin.get();
 }
