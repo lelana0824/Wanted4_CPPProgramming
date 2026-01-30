@@ -3,6 +3,13 @@
 class Account
 {
 public:
+    Account(const Account& account)
+        : id(account.id), balance(account.balance)
+    {
+        int length = strlen(account.name) + 1;
+        name = new char[length];
+        strcpy_s(name, sizeof(char), account.name);
+    }
     Account(int id, char* name, int balance)
         : id(id), balance(balance)
     {
@@ -18,7 +25,7 @@ public:
     void PrintInfo()
     {
         std::cout << "id: " << id << "\n";
-        std::cout << "name: " << *name << "\n";
+        std::cout << "name: " << name << "\n";
         std::cout << "balance: " << balance << "\n";
         std::cout << "\n";
     }
@@ -54,50 +61,32 @@ public:
     void Run()
     {
 
-        while (bInitView)
+        char input = ' ';
+
+        while (input != 'q')
         {
             ShowMenu();
-        }
-
-        while (!bInitView)
-        {
-            std::string input;
             std::cout << "문자를 입력하세요 (q로 종료): ";
+            std::cin >> input;
 
-            // 1. 공백을 포함한 한 줄을 입력받거나, 
-            //    문자 하나만 필요하다면 cin >> input 사용
-            if (!(std::cin >> input)) break;
-
-            // 2. std::string은 널 종료 문자(\0)를 알아서 관리함
-            if (input == "q") {
-                break; // 3. delete[] 필요 없음
-            }
-            if (input == "1")
+            if (input == '1')
             {
-                int id = 0; 
-                char* name = new char(100);
-                int balance = 0;
-                std::cout << "1번 메뉴 선택하셨습니다.\n";
-                std::cout << "id를 입력해주세요: \n";
-                std::cin >> id;
-                std::cout << "이름을 입력해주세요: \n";
-                std::cin >> *name;
-                std::cout << "잔액을 입력해주세요: \n";
-                std::cin >> balance;
-
-                std::cout << "계좌 개설이 완료되었습니다.\n";
-
-                CreateAccount(id, name, balance);
-                bInitView = true;
-                break;
-                
+                CreateAccount();
             }
 
-            if (input == "4")
+            if (input == '2')
+            {
+                Deposit();
+            }
+
+            if (input == '3')
+            {
+                Withdraw();
+            }
+
+            if (input == '4')
             {
                 Inquire();
-                bInitView = true;
-                break;
             }
         }
     }
@@ -108,43 +97,71 @@ private:
         std::cout << "1. 계좌 개설\n";
         std::cout << "2. 입금\n";
         std::cout << "3. 출금\n";
-        std::cout << "4. 전체 고객 잔액 조회\n";
+        std::cout << "4. 전체 고객 잔액 조회\n\n\n";
 
-        std::string input;
-        std::cout << "문자를 입력하세요 (q로 종료): ";
     }
-    void CreateAccount(int id, char* name, int balance) {
+    void CreateAccount() {
+        int id = 0;
+        char name[100];
+        int balance = 0;
+        std::cout << "1번 메뉴 선택하셨습니다.\n";
+        std::cout << "id를 입력해주세요: \n";
+        std::cin >> id;
+        std::cout << "이름을 입력해주세요: \n";
+        std::cin >> name;
+        std::cout << "잔액을 입력해주세요: \n";
+        std::cin >> balance;
+
+        std::cout << "계좌 개설이 완료되었습니다.\n\n\n";
+
         Account* account = new Account(id, name, balance);
-        accounts[0] = account;
-        
+        accounts[accountsIndex++] = account;
     }
-    void Deposit(int id, int balance) {
+    void Deposit() {
+        int id = 0;
+        int balance = 0;
+        std::cout << "2번 메뉴 선택하셨습니다.\n";
+        std::cout << "id를 입력해주세요: \n";
+        std::cin >> id;
+        std::cout << "금액을 입력해주세요: \n";
+        std::cin >> balance;
+
         for (Account* account : accounts)
         {
             if (account->GetId() == id)
             {
                 account->Deposit(balance);
+                break;
             }
         }
     }
-    void Withdraw(int id, int balance) {
+    void Withdraw() {
+        int id = 0;
+        int balance = 0;
+        std::cout << "3번 메뉴 선택하셨습니다.\n";
+        std::cout << "id를 입력해주세요: \n";
+        std::cin >> id;
+        std::cout << "금액을 입력해주세요: \n";
+        std::cin >> balance;
+
         for (Account* account : accounts)
         {
             if (account->GetId() == id)
             {
                 account->Withdraw(balance);
+                break;
             }
         }
     }
     void Inquire() {
-        for (Account* account : accounts)
+        for (int i = 0; i < accountsIndex; ++i)
         {
-            account->PrintInfo();
+            accounts[i]->PrintInfo();
         }
 
     }
+    int accountsIndex = 0;
     Account* accounts[100] = {};
-    bool bInitView = true;
 };
 
 
