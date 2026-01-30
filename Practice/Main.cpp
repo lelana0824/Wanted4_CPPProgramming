@@ -8,7 +8,7 @@ public:
     {
         int length = strlen(account.name) + 1;
         name = new char[length];
-        strcpy_s(name, sizeof(char), account.name);
+        strcpy_s(name, length, account.name);
     }
     Account(int id, char* name, int balance)
         : id(id), balance(balance)
@@ -22,7 +22,7 @@ public:
         delete[] name;
         name = nullptr;
     }
-    void PrintInfo()
+    virtual void PrintInfo()
     {
         std::cout << "id: " << id << "\n";
         std::cout << "name: " << name << "\n";
@@ -33,7 +33,7 @@ public:
     {
         return id;
     }
-    void Deposit(int balance)
+    virtual void Deposit(int balance)
     {
         this->balance += balance;
     }
@@ -42,10 +42,46 @@ public:
         this->balance -= balance;
     }
 
-private:
+protected:
     int id = 0;
     char* name = nullptr;
     int balance = 0;
+};
+
+class CreditAccount : public Account
+{
+public:
+    CreditAccount(int id, char* name, int balance)
+        :Account(id, name, balance)
+    {
+
+    }
+    virtual void Deposit(int balance) override {
+        Account::Deposit(balance + balance * 0.01);
+    }
+};
+
+class DonationAccount : public Account
+{
+public:
+    DonationAccount(int id, char* name, int balance)
+        :Account(id, name, balance) {
+        ;
+    }
+    virtual void Deposit(int balance) override {
+        float donation = balance * 0.01;
+        Account::Deposit(balance - donation);
+        donationMoney += donation;
+
+    }
+    virtual void PrintInfo() override {
+        std::cout << "총 기부금액: " << donationMoney << "\n";
+
+        Account::PrintInfo();
+    }
+
+private:
+    float donationMoney = 0;
 };
 
 
@@ -100,11 +136,23 @@ private:
         std::cout << "4. 전체 고객 잔액 조회\n\n\n";
 
     }
+    enum class AccountType {
+        Normal,
+        Credit,
+        Donation,
+    };
+    
     void CreateAccount() {
+        std::cout << "1번 메뉴 선택하셨습니다.\n";
+
+        int accountType = 0;
+        std::cout << "문자를 입력하세요 (0: 보통계좌, 1: 신용계좌, 2: 기부계좌): \n";
+        std::cin >> accountType;
+
+
         int id = 0;
         char name[100];
         int balance = 0;
-        std::cout << "1번 메뉴 선택하셨습니다.\n";
         std::cout << "id를 입력해주세요: \n";
         std::cin >> id;
         std::cout << "이름을 입력해주세요: \n";
@@ -114,8 +162,30 @@ private:
 
         std::cout << "계좌 개설이 완료되었습니다.\n\n\n";
 
-        Account* account = new Account(id, name, balance);
-        accounts[accountsIndex++] = account;
+        Account* account = nullptr;
+        switch (static_cast<AccountType>(accountType))
+        {
+            case AccountType::Normal: {
+                account = new Account(id, name, balance);
+                break;
+            }
+            case AccountType::Credit: {
+                account = new CreditAccount(id, name, balance);
+                break;
+            }
+            case AccountType::Donation: {
+                account = new DonationAccount(id, name, balance);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+        if (account)
+        {
+            accounts[accountsIndex++] = account;
+        }
     }
     void Deposit() {
         int id = 0;
